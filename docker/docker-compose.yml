@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  simple-s3-storage:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: simple-s3-storage
+    restart: unless-stopped
+    ports:
+      - "8080:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - MAX_UPLOAD_SIZE=100MB
+      - ALLOWED_EXTENSIONS=pdf,txt,png,jpg,jpeg,gif,doc,docx,ppt,pptx,xls,xlsx,zip,rar,mp4,mp3,avi,mov
+      - DATA_DIR=/app/data
+    volumes:
+      - storage_data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - s3_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: s3-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # Optional: for SSL certificates
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - simple-s3-storage
+    networks:
+      - s3_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: s3-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - s3_network
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+volumes:
+  storage_data:
+    driver: local
+  nginx_logs:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  s3_network:
+    driver: bridge

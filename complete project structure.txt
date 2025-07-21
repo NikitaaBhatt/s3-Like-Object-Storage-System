@@ -1,0 +1,50 @@
+s3-like-object-storage-system/
+├── backend/
+│   ├── app.py                    # Main Flask application
+│   ├── auth.py                   # User authentication
+│   ├── storage.py                # Bucket & file operations
+│   ├── database.py               # User data management
+│   ├── permissions.py            # Bucket sharing & access control
+│   ├── search.py                 # File search & filtering engine
+│   ├── requirements.txt          # Python dependencies
+│   └── config.py                 # Configuration settings
+├── frontend/
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── LoginPage.jsx         # Login form
+│   │   │   ├── Dashboard.jsx         # Main page after login
+│   │   │   ├── BucketList.jsx        # Show user's buckets
+│   │   │   ├── FileUpload.jsx        # Upload files to bucket
+│   │   │   ├── FileList.jsx          # Show files in bucket
+│   │   │   ├── SearchBar.jsx         # Search files across buckets
+│   │   │   ├── FilterPanel.jsx       # Filter files by type, date, size
+│   │   │   ├── ShareModal.jsx        # Share bucket with other users
+│   │   │   ├── PermissionsPanel.jsx  # Manage bucket permissions
+│   │   │   ├── SharedBuckets.jsx     # View buckets shared with user
+│   │   │   └── StorageStats.jsx      # Storage usage statistics
+│   │   ├── services/
+│   │   │   ├── api.js               # API calls to backend
+│   │   │   ├── search.js            # Search-related API calls
+│   │   │   └── permissions.js       # Sharing & permissions API
+│   │   ├── App.jsx
+│   │   └── index.js
+│   ├── package.json
+│   └── tailwind.config.js
+├── data/                         # Local storage directory
+│   ├── users.json               # User credentials storage
+│   ├── permissions.json         # Bucket sharing permissions
+│   ├── search_index.json        # File search index
+│   ├── uploads/                 # User uploaded files
+│   │   └── [user_id]/          # Each user gets own folder
+│   │       └── [bucket_name]/  # Each bucket is a folder
+│   └── metadata/               # File metadata & search data
+│       └── file_metadata.json  # File information for search
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── deploy/
+│   ├── nginx.conf
+│   └── deploy.sh
+└── README.md
